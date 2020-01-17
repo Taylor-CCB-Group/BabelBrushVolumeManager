@@ -1,0 +1,6 @@
+.project
+.pydevproject
+*.spec
+build
+dist
+__pycache__
