@@ -124,8 +124,8 @@ class BabelBrushVolumeHub(object):
             frames=dims[3]
         else:
             frames=1   
-        width=dims[1]
-        height=dims[0]
+        width=dims[0]
+        height=dims[1]
         slices=dims[2]
         
         # get pixel height/width and depth (in mm)

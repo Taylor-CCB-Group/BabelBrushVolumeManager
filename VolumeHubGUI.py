@@ -1,4 +1,4 @@
-import wx,sys,subprocess
+import wx,sys,subprocess,os,time
 from BabelBrushVolumeHub import BabelBrushVolumeHub,create_directory_structure
 
 
@@ -43,6 +43,7 @@ class VolumeList(wx.ListCtrl):
         for item in self.volume_hub.volumes:
             item["_image_index"]=self.il.Add(wx.Bitmap(item["thumbnail"],wx.BITMAP_TYPE_JPEG))
         self.SetItemCount(len(self.volume_hub.volumes))
+        self.Refresh()
 
   
     def OnGetItemText(self, item, col):
@@ -81,7 +82,7 @@ class BabelBrushVolumeManager(wx.Frame):
         folder_label.SetFont(label_font)
         top_box.Add(folder_label,0,wx.RIGHT,15)
         
-        self.hub_label = wx.StaticText(self,size=(200,40))
+        self.hub_label = wx.StaticText(self,size=(300,40))
         top_box.Add(self.hub_label)
         
         change_folder_button = wx.Button(self,-1,"Open")
@@ -154,10 +155,16 @@ class BabelBrushVolumeManager(wx.Frame):
         if base_folder:
             self.change_to_hub(base_folder)
     
-    def launch_babel(self):
-        folder=self.babel_hub.base_folder
-        subprocess.Popen(["babel.exe", folder])
-        sys.exit(0)
+    def launch_babel(self,event):
+        exe_folder = os.path.realpath(os.path.dirname(sys.argv[0]))
+        try:
+            exe = os.path.join(exe_folder,"Babel Brush.exe")
+            subprocess.Popen([exe,"--hub_folder",self.babel_hub.base_folder])
+            sys.exit(0)
+        except Exception as e:
+            self.write_message("Unable to run {}".format(exe),True)
+            
+        
     
     def delete_volume(self,event):
         index  = self. volume_list.GetFirstSelected()
@@ -243,11 +250,10 @@ class BabelBrushVolumeManager(wx.Frame):
             self.write_message("Could not open {}".format(path),True)
             self.write_message(str(e),True)
             
-       
-       
+         
     
 ex = wx.App() 
-BabelBrushVolumeManager("c:\\data\\nii\\tst\\Babel") 
+BabelBrushVolumeManager(os.path.join(os.path.expanduser("~"),"Documents","Babel")) 
 ex.MainLoop()
 
 
