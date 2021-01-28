@@ -33,5 +33,5 @@ hub.index_nii_file("/path/to/file.nii")
 ### Building
 To get a single clickable executable:-
 ```
-pyinstaller -w -F VolumeHubGUI.py
+pyinstaller -w --add-data="data/;./data" -F VolumeHubGUI.py
 ```

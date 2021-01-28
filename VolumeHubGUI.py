@@ -1,4 +1,4 @@
-import wx,sys,subprocess,os,time
+import wx,sys,subprocess,os
 from BabelBrushVolumeHub import BabelBrushVolumeHub,create_directory_structure
 
 
@@ -23,9 +23,9 @@ class VolumeList(wx.ListCtrl):
         self.InsertColumn(1, "Volume")
         self.InsertColumn(2, "File")
      
-        self.SetColumnWidth(0, 60)
-        self.SetColumnWidth(1, 80)
-        self.SetColumnWidth(2, 150)
+        self.SetColumnWidth(0, 65)
+        self.SetColumnWidth(1, 100)
+        self.SetColumnWidth(2, 180)
 
         self.SetItemCount(len(volume_hub.volumes))
      
@@ -70,8 +70,9 @@ class BabelBrushVolumeManager(wx.Frame):
         super(BabelBrushVolumeManager, self).__init__(parent, title = title,size=(1000,600))    
         
         label_font=  wx.Font(16, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
-        info_font= wx.Font(16,wx.FONTFAMILY_SWISS,wx.NORMAL, wx.NORMAL)
-            
+        info_font= wx.Font(13,wx.FONTFAMILY_SWISS,wx.NORMAL, wx.NORMAL)
+        norm_font= wx.Font(12,wx.FONTFAMILY_SWISS,wx.NORMAL, wx.NORMAL)
+        norm_font_bold= wx.Font(12,wx.FONTFAMILY_SWISS,wx.NORMAL, wx.BOLD)
         #splt top bottom
         outer_box=wx.BoxSizer(wx.VERTICAL)
         top_box=wx.BoxSizer(wx.HORIZONTAL)
@@ -82,7 +83,7 @@ class BabelBrushVolumeManager(wx.Frame):
         folder_label.SetFont(label_font)
         top_box.Add(folder_label,0,wx.RIGHT,15)
         
-        self.hub_label = wx.StaticText(self,size=(300,40))
+        self.hub_label = wx.StaticText(self,size=(300,40),style=wx.ST_ELLIPSIZE_END)
         top_box.Add(self.hub_label)
         
         change_folder_button = wx.Button(self,-1,"Open")
@@ -128,7 +129,20 @@ class BabelBrushVolumeManager(wx.Frame):
         left_box.Add(bottom_left_box,1,wx.EXPAND|wx.ALL)
         
         
-        main_left_box.Add(-1,-1)
+        
+        config_box= wx.BoxSizer(wx.HORIZONTAL)
+        fiji_lab= wx.StaticText(self,label="Fiji Path:")
+        fiji_lab.SetFont(norm_font_bold)
+        config_box.Add(fiji_lab)
+        self.fiji_label=wx.StaticText(self,label="None",size=(250,-1),style=wx.ST_ELLIPSIZE_END)
+        self.fiji_label.SetFont(norm_font)
+        config_box.Add(self.fiji_label)
+        self.fiji_btn=wx.Button(self,-1,"Change")
+        self.fiji_btn.Bind(wx.EVT_BUTTON,self.change_fiji_path)
+        self.fiji_btn.Disable()
+        config_box.Add(self.fiji_btn)
+        main_left_box.Add(config_box,-1,wx.EXPAND)
+        
         log_label=wx.StaticText(self,label="Log")
         log_label.SetFont(label_font)
         
@@ -235,6 +249,26 @@ class BabelBrushVolumeManager(wx.Frame):
         dlg.Destroy()
     
     
+    def change_fiji_path(self,event):
+        dlg = wx.FileDialog(
+            self, message="Choose fiji(imagej) exe",
+            defaultFile="",
+            wildcard="*.exe",
+            style=wx.FD_OPEN | wx.FD_CHANGE_DIR
+            )
+        if dlg.ShowModal() == wx.ID_OK:
+            paths = dlg.GetPaths()
+            try:
+                self.babel_hub.config["Fiji"]["path"]=paths[0]
+                self.babel_hub.update_config()
+                self.fiji_label.SetLabel(paths[0])
+                self.write_message("Updated config with fiji path")
+            except Exception as e:
+                self.write_message("Unable to update config",True)
+                self.write_message(str(e),True)
+            
+        dlg.Destroy()
+    
     def change_to_hub(self,path):
         try:
             self.babel_hub.open_hub(path)
@@ -243,6 +277,11 @@ class BabelBrushVolumeManager(wx.Frame):
             self.index_button.Enable()
             self.del_button.Enable()
             self.launch_button.Enable()
+            self.fiji_btn.Enable()
+            fiji_path= self.babel_hub.config["Fiji"]["path"]
+            if not fiji_path:
+                fiji_path="none"
+            self.fiji_label.SetLabel(fiji_path)
             self.write_message("Opened {}".format(path))
             
         

@@ -3,8 +3,9 @@ cycler==0.10.0
 future==0.18.2
 kiwisolver==1.1.0
 matplotlib==3.1.2
-nibabel==2.5.1
+nibabel==3.2.1
 numpy==1.17.4
+packaging==20.8
 pefile==2019.4.18
 Pillow==6.2.1
 PyInstaller==3.6
