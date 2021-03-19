@@ -7,7 +7,7 @@ nibabel==3.2.1
 numpy==1.17.4
 packaging==20.8
 pefile==2019.4.18
-Pillow==6.2.1
+Pillow==8.1.1
 PyInstaller==3.6
 pyparsing==2.4.5
 python-dateutil==2.8.1
